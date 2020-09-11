@@ -1,12 +1,13 @@
 import { User } from "./../entities/User";
 import {
   Resolver,
-  //Query,
+  Query,
   InputType,
   Field,
   Mutation,
   Arg,
-  Ctx,ObjectType
+  Ctx,
+  ObjectType
 } from "type-graphql";
 import { MyContext } from "../types";
 import argon2 from "argon2";
@@ -31,6 +32,8 @@ class FieldError{
 
 @ObjectType()
 class UserResponse{
+  
+
   @Field(() => [FieldError], {nullable: true})
   errors?: FieldError[]
 
@@ -40,6 +43,21 @@ class UserResponse{
 
 @Resolver()
 export class UserResolver {
+
+  @Query(() => User, {nullable: true})
+  async me(
+    @Ctx() { em, req }: MyContext
+  ){
+    // no estas logeado
+    if(!req.session.userId){
+      return null
+    }
+
+    const user = await em.findOne(User, {id: req.session.userId});
+
+    return user
+  }
+
   @Mutation(() => UserResponse)
   async register(
     @Arg("options") options: UsernamePasswordInput,
@@ -89,7 +107,7 @@ export class UserResolver {
   @Mutation(() => UserResponse)
   async login(
     @Arg("options") options: UsernamePasswordInput,
-    @Ctx() { em }: MyContext
+    @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
     const user = await em.findOne(User, {username: options.username});
     if(!user){
@@ -111,6 +129,10 @@ export class UserResolver {
         }]
       }
     }
+
+    // Logea al usuario inicializando una cookie con el id
+    req.session.userId = user.id;
+
     return {
       user
     };
