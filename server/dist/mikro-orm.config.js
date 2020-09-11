@@ -18,5 +18,6 @@ exports.default = {
     user: "postgres",
     password: "biancayabel.19",
     debug: !constants_1.__prod__,
+    charset: "utf8"
 };
 //# sourceMappingURL=mikro-orm.config.js.map

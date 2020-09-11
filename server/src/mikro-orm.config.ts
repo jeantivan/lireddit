@@ -15,4 +15,5 @@ export default {
   user: "postgres",
   password: "biancayabel.19",
   debug: !__prod__,
+  charset: "utf8"
 } as Parameters<typeof MikroORM.init>[0];

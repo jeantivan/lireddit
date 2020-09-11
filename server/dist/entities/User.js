@@ -19,7 +19,7 @@ let User = class User {
     }
 };
 __decorate([
-    type_graphql_1.Field(() => type_graphql_1.Int),
+    type_graphql_1.Field(),
     core_1.PrimaryKey(),
     __metadata("design:type", Number)
 ], User.prototype, "id", void 0);
@@ -35,11 +35,11 @@ __decorate([
 ], User.prototype, "updatedAt", void 0);
 __decorate([
     type_graphql_1.Field(),
-    core_1.Property({ type: "text", unique: true }),
+    core_1.Property({ unique: true }),
     __metadata("design:type", String)
 ], User.prototype, "username", void 0);
 __decorate([
-    core_1.Property({ type: "text" }),
+    core_1.Property(),
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
 User = __decorate([
