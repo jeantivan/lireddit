@@ -49,11 +49,11 @@ export class UserResolver {
     @Ctx() { em, req }: MyContext
   ){
     // no estas logeado
-    if(!req.session.userId){
+    if(!req.session!.userId){
       return null
     }
 
-    const user = await em.findOne(User, {id: req.session.userId});
+    const user = await em.findOne(User, {id: req.session!.userId});
 
     return user
   }
@@ -131,7 +131,7 @@ export class UserResolver {
     }
 
     // Logea al usuario inicializando una cookie con el id
-    req.session.userId = user.id;
+    req.session!.userId = user.id;
 
     return {
       user

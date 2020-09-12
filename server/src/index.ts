@@ -1,5 +1,5 @@
-import { MyContext } from './types';
-import { __prod__ } from './constants';
+import { MyContext } from "./types";
+import { __prod__ } from "./constants";
 import "reflect-metadata";
 import { MikroORM } from "@mikro-orm/core";
 import microConfig from "./mikro-orm.config";
@@ -9,9 +9,10 @@ import { buildSchema } from "type-graphql";
 import { HelloResolver } from "./resolvers/hello";
 import { PostResolver } from "./resolvers/post";
 import { UserResolver } from "./resolvers/user";
-import redis from 'redis';
-import session from 'express-session';
-import connectRedis from 'connect-redis'
+import redis from "redis";
+import session from "express-session";
+import connectRedis from "connect-redis";
+import cors from "cors";
 
 async function main() {
   const orm = await MikroORM.init(microConfig);
@@ -19,36 +20,43 @@ async function main() {
 
   const app = express();
 
-  const RedisStore = connectRedis(session)
-  const redisClient = redis.createClient()
- 
+  const RedisStore = connectRedis(session);
+  const redisClient = redis.createClient();
+
+  app.use(
+    cors({
+      origin: "http://localhost:3000",
+      credentials: true,
+    })
+  );
   app.use(
     session({
-      name: 'qid',
-      store: new RedisStore({ client: redisClient,
-        disableTouch: true
-      }),
-      cookie:{
+      name: "qid",
+      store: new RedisStore({ client: redisClient, disableTouch: true }),
+      cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 años
         httpOnly: true,
-        sameSite: 'lax',
+        sameSite: "lax",
         secure: __prod__, // Solo funciona en https
       },
       saveUninitialized: false,
-      secret: 'randomstring',
+      secret: "randomstring",
       resave: false,
     })
-  )
+  );
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
       resolvers: [HelloResolver, PostResolver, UserResolver],
       validate: false,
     }),
-    context: ({req, res}): MyContext => ({ em: orm.em.fork(), req, res }),
+    context: ({ req, res }): MyContext => ({ em: orm.em.fork(), req, res }),
   });
 
-  apolloServer.applyMiddleware({ app });
+  apolloServer.applyMiddleware({
+    app,
+    cors: false,
+  });
 
   app.listen(4000, () => {
     console.log("Server started on localhost:4000");
