@@ -7,10 +7,11 @@ import {
   Mutation,
   Arg,
   Ctx,
-  ObjectType
+  ObjectType,
 } from "type-graphql";
 import { MyContext } from "../types";
 import argon2 from "argon2";
+import { EntityManager } from "@mikro-orm/postgresql";
 
 @InputType()
 class UsernamePasswordInput {
@@ -22,75 +23,80 @@ class UsernamePasswordInput {
 }
 
 @ObjectType()
-class FieldError{
+class FieldError {
   @Field()
   field: string;
   @Field()
   message: string;
-
 }
 
 @ObjectType()
-class UserResponse{
-  
+class UserResponse {
+  @Field(() => [FieldError], { nullable: true })
+  errors?: FieldError[];
 
-  @Field(() => [FieldError], {nullable: true})
-  errors?: FieldError[]
-
-  @Field(()=>User, {nullable: true})
-  user?: User
+  @Field(() => User, { nullable: true })
+  user?: User;
 }
 
 @Resolver()
 export class UserResolver {
-
-  @Query(() => User, {nullable: true})
-  async me(
-    @Ctx() { em, req }: MyContext
-  ){
+  @Query(() => User, { nullable: true })
+  async me(@Ctx() { em, req }: MyContext) {
     // no estas logeado
-    if(!req.session!.userId){
-      return null
+    if (!req.session.userId) {
+      return null;
     }
 
-    const user = await em.findOne(User, {id: req.session!.userId});
+    const user = await em.findOne(User, { id: req.session!.userId });
 
-    return user
+    return user;
   }
 
   @Mutation(() => UserResponse)
   async register(
     @Arg("options") options: UsernamePasswordInput,
-    @Ctx() { em }: MyContext
+    @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
-
-    if(options.username.length <=2){
-      return{
-        errors:[{
-          field: 'username',
-          message: 'length must be greater than 2'
-        }]
-      }
+    if (options.username.length <= 2) {
+      return {
+        errors: [
+          {
+            field: "username",
+            message: "length must be greater than 2",
+          },
+        ],
+      };
     }
 
-    if(options.password.length <= 2){
-      return{
-        errors:[{
-          field: 'username',
-          message: 'length must be greater than 2'
-        }]
-      }
+    if (options.password.length <= 2) {
+      return {
+        errors: [
+          {
+            field: "password",
+            message: "length must be greater than 2",
+          },
+        ],
+      };
     }
 
     const hashedPassword = await argon2.hash(options.password);
-    const user = em.create(User, {
-      username: options.username,
-      password: hashedPassword,
-    });
-    try{
-      await em.persistAndFlush(user);
-    }catch(err){
-      if(err.code === '23505'){
+    let user;
+    try {
+      const result = await (em as EntityManager)
+        .createQueryBuilder(User)
+        .getKnexQuery()
+        .insert({
+          username: options.username,
+          password: hashedPassword,
+          created_at: new Date(),
+          updated_at: new Date(),
+        })
+        .returning("*");
+
+      user = result[0];
+    } catch (err) {
+      if (err.code === "23505") {
         return {
           errors: [
             {
@@ -101,7 +107,9 @@ export class UserResolver {
         };
       }
     }
-    return {user};
+
+    req.session.userId = user.id;
+    return { user };
   }
 
   @Mutation(() => UserResponse)
@@ -109,32 +117,35 @@ export class UserResolver {
     @Arg("options") options: UsernamePasswordInput,
     @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
-    const user = await em.findOne(User, {username: options.username});
-    if(!user){
+    const user = await em.findOne(User, { username: options.username });
+    if (!user) {
       return {
-        errors: [{
-          field: 'username',
-          message: "username doesn't exist",
-        }]
-      }
+        errors: [
+          {
+            field: "username",
+            message: "username doesn't exist",
+          },
+        ],
+      };
     }
 
-
     const valid = await argon2.verify(user.password, options.password);
-    if(!valid){
+    if (!valid) {
       return {
-        errors: [{
-          field: 'password',
-          message: "incorrect password",
-        }]
-      }
+        errors: [
+          {
+            field: "password",
+            message: "incorrect password",
+          },
+        ],
+      };
     }
 
     // Logea al usuario inicializando una cookie con el id
     req.session!.userId = user.id;
 
     return {
-      user
+      user,
     };
   }
 }

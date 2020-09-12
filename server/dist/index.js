@@ -55,7 +55,7 @@ function main() {
                 resolvers: [hello_1.HelloResolver, post_1.PostResolver, user_1.UserResolver],
                 validate: false,
             }),
-            context: ({ req, res }) => ({ em: orm.em.fork(), req, res }),
+            context: ({ req, res }) => ({ em: orm.em, req, res }),
         });
         apolloServer.applyMiddleware({
             app,
