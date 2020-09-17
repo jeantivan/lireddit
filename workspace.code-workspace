@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "server"
+		},
+		{
+			"path": "web"
+		}
+	],
+	"settings": {
+		"editor.formatOnPaste": true,
+		"editor.formatOnSave": true
+	}
+}
