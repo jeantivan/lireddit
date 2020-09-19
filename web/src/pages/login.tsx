@@ -8,58 +8,61 @@ import { useRouter } from "next/router";
 import { withUrqlClient } from "next-urql";
 import { createUrqlClient } from "../utils/createUrqlClient";
 import NextLink from "next/link";
+import { Layout } from "../components/Layout";
 
 const Login: React.FC<{}> = ({}) => {
   const router = useRouter();
   const [, login] = useLoginMutation();
   return (
-    <Wrapper variant="small">
-      <Formik
-        initialValues={{ usernameOrEmail: "", password: "" }}
-        onSubmit={async (values, { setErrors }) => {
-          const response = await login(values);
-          if (response.data?.login.errors) {
-            setErrors(toErrorMap(response.data.login.errors));
-          } else if (response.data?.login.user) {
-            router.push("/");
-          }
-        }}
-      >
-        {({ isSubmitting }) => (
-          <Form>
-            <InputField
-              name="usernameOrEmail"
-              placeholder="username or email"
-              label="Username or Email"
-            />
-            <Box mt={4}>
+    <Layout title="Login">
+      <Wrapper variant="small">
+        <Formik
+          initialValues={{ usernameOrEmail: "", password: "" }}
+          onSubmit={async (values, { setErrors }) => {
+            const response = await login(values);
+            if (response.data?.login.errors) {
+              setErrors(toErrorMap(response.data.login.errors));
+            } else if (response.data?.login.user) {
+              router.push("/");
+            }
+          }}
+        >
+          {({ isSubmitting }) => (
+            <Form>
               <InputField
-                name="password"
-                placeholder="password"
-                label="Password"
-                type="password"
+                name="usernameOrEmail"
+                placeholder="username or email"
+                label="Username or Email"
               />
-            </Box>
-            <Flex mt={2}>
-              <NextLink href="/forgot-password" passHref>
-                <Link ml="auto" pt={1}>
-                  Forgot password?
-                </Link>
-              </NextLink>
-            </Flex>
+              <Box mt={4}>
+                <InputField
+                  name="password"
+                  placeholder="password"
+                  label="Password"
+                  type="password"
+                />
+              </Box>
+              <Flex mt={2}>
+                <NextLink href="/forgot-password" passHref>
+                  <Link ml="auto" pt={1}>
+                    Forgot password?
+                  </Link>
+                </NextLink>
+              </Flex>
 
-            <Button
-              isLoading={isSubmitting}
-              mt={4}
-              variantColor="teal"
-              type="submit"
-            >
-              Login
-            </Button>
-          </Form>
-        )}
-      </Formik>
-    </Wrapper>
+              <Button
+                isLoading={isSubmitting}
+                mt={4}
+                variantColor="teal"
+                type="submit"
+              >
+                Login
+              </Button>
+            </Form>
+          )}
+        </Formik>
+      </Wrapper>
+    </Layout>
   );
 };
 

@@ -10,6 +10,7 @@ import { Wrapper } from "../../components/Wrapper";
 import { useChangePasswordMutation } from "../../generated/graphql";
 import { createUrqlClient } from "../../utils/createUrqlClient";
 import { toErrorMap } from "../../utils/toErrorMap";
+import { Layout } from "../../components/Layout";
 
 const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
   const router = useRouter();
@@ -17,56 +18,58 @@ const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
   const [tokenError, setTokenError] = useState("");
 
   return (
-    <Wrapper variant="small">
-      <Formik
-        initialValues={{ newPassword: "" }}
-        onSubmit={async (values, { setErrors }) => {
-          const response = await changePassword({
-            newPassword: values.newPassword,
-            token,
-          });
-          if (response.data?.changePassword.errors) {
-            const errorMap = toErrorMap(response.data.changePassword.errors);
-            if ("token" in errorMap) {
-              setTokenError(errorMap.token);
-            }
+    <Layout title="Change Password">
+      <Wrapper variant="small">
+        <Formik
+          initialValues={{ newPassword: "" }}
+          onSubmit={async (values, { setErrors }) => {
+            const response = await changePassword({
+              newPassword: values.newPassword,
+              token,
+            });
+            if (response.data?.changePassword.errors) {
+              const errorMap = toErrorMap(response.data.changePassword.errors);
+              if ("token" in errorMap) {
+                setTokenError(errorMap.token);
+              }
 
-            setErrors(errorMap);
-          } else if (response.data?.changePassword.user) {
-            router.push("/");
-          }
-        }}
-      >
-        {({ isSubmitting }) => (
-          <Form>
-            <InputField
-              name="newPassword"
-              placeholder="new password"
-              label="New password"
-              type="password"
-            />
-            {tokenError && (
-              <Flex>
-                <Box color="tomato" px={2} pt={1}>
-                  {tokenError}
-                </Box>
-                <NextLink href="/forgot-password" passHref>
-                  <Link pt={1}>click here to get a new one</Link>
-                </NextLink>
-              </Flex>
-            )}
-            <Button
-              isLoading={isSubmitting}
-              mt={4}
-              variantColor="teal"
-              type="submit"
-            >
-              Change password
-            </Button>
-          </Form>
-        )}
-      </Formik>
-    </Wrapper>
+              setErrors(errorMap);
+            } else if (response.data?.changePassword.user) {
+              router.push("/");
+            }
+          }}
+        >
+          {({ isSubmitting }) => (
+            <Form>
+              <InputField
+                name="newPassword"
+                placeholder="new password"
+                label="New password"
+                type="password"
+              />
+              {tokenError && (
+                <Flex>
+                  <Box color="tomato" px={2} pt={1}>
+                    {tokenError}
+                  </Box>
+                  <NextLink href="/forgot-password" passHref>
+                    <Link pt={1}>click here to get a new one</Link>
+                  </NextLink>
+                </Flex>
+              )}
+              <Button
+                isLoading={isSubmitting}
+                mt={4}
+                variantColor="teal"
+                type="submit"
+              >
+                Change password
+              </Button>
+            </Form>
+          )}
+        </Formik>
+      </Wrapper>
+    </Layout>
   );
 };
 
