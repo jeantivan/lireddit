@@ -10,6 +10,8 @@ import {
   Arg,
   Ctx,
   ObjectType,
+  FieldResolver,
+  Root,
 } from "type-graphql";
 import argon2 from "argon2";
 import { UsernamePasswordInput } from "./UsernamePasswordInput";
@@ -34,8 +36,19 @@ class UserResponse {
   user?: User;
 }
 
-@Resolver()
+@Resolver(User)
 export class UserResolver {
+  @FieldResolver(() => String)
+  email(@Root() user: User, @Ctx() { req }: MyContext) {
+    // Usuario actual y esta bien mostrarle su propio email
+    if (req.session.userId === user.id) {
+      return user.email;
+    }
+
+    // Usuario actual quiere ver el email de alguien mail
+    return "";
+  }
+
   @Query(() => User, { nullable: true })
   me(@Ctx() { req }: MyContext) {
     // no estas logeado

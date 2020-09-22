@@ -6,6 +6,7 @@ import {
   InputType,
   Int,
   Mutation,
+  ObjectType,
   Query,
   Resolver,
   Root,
@@ -14,6 +15,7 @@ import {
 import { getConnection } from "typeorm";
 import { MyContext } from "../types";
 import { Post } from "./../entities/Post";
+import { Updoot } from "./../entities/Updoot";
 import { isAuth } from "./../middleware/isAuth";
 
 @InputType()
@@ -24,6 +26,15 @@ class PostInput {
   text: string;
 }
 
+@ObjectType()
+class PaginatedPosts {
+  @Field(() => [Post])
+  posts: Post[];
+
+  @Field()
+  hasMore: boolean;
+}
+
 @Resolver(Post)
 export class PostResolver {
   @FieldResolver(() => String)
@@ -31,23 +42,95 @@ export class PostResolver {
     return root.text.slice(0, 50);
   }
 
-  @Query(() => [Post])
-  posts(
+  @Mutation(() => Boolean)
+  @UseMiddleware(isAuth)
+  async vote(
+    @Ctx() { req }: MyContext,
+    @Arg("postId", () => Int) postId: number,
+    @Arg("value", () => Int) value: number
+  ) {
+    const { userId } = req.session;
+
+    const isUpdoot = value !== -1;
+
+    const realValue = isUpdoot ? 1 : -1;
+
+    // await Updoot.insert({
+    //   userId,
+    //   postId,
+    //   value: realValue,
+    // });
+
+    await getConnection().query(
+      `
+      START TRANSACTION;
+
+      insert into updoot ("userId", "postId","value")
+      values (${userId}, ${postId}, ${realValue});
+
+      update post 
+      set points = points + ${realValue}
+      where id = ${postId};
+
+      COMMIT;
+    `
+    );
+
+    return true;
+  }
+
+  @Query(() => PaginatedPosts)
+  async posts(
     @Arg("limit", () => Int) limit: number,
     @Arg("cursor", () => String, { nullable: true }) cursor: string | null
-  ): Promise<Post[]> {
-    const realLimit = Math.min(50, limit);
-    const qb = getConnection()
-      .getRepository(Post)
-      .createQueryBuilder("p")
-      .orderBy('"createdAt"', "DESC")
-      .take(realLimit);
+  ): Promise<PaginatedPosts> {
+    const realLimit = Math.min(50, limit) + 1;
+    const realLimitPlusOne = realLimit + 1;
+
+    const replacements: any[] = [realLimitPlusOne];
 
     if (cursor) {
-      qb.where('"createdAt" < :cursor', { cursor: new Date(parseInt(cursor)) });
+      replacements.push(new Date(parseInt(cursor)));
     }
 
-    return qb.getMany();
+    const posts = await getConnection().query(
+      `
+      select p.*, 
+      json_build_object(
+        'id', u.id,
+        'username', u.username,
+        'email', u.email,
+        'createdAt', u."createdAt",
+        'updatedAt', u."updatedAt"
+        ) creator
+      from post p
+      inner join public.user u on u.id = p."creatorId"
+      ${cursor ? `where p."createdAt < $2` : ""}
+      order by p."createdAt" DESC
+      limit $1
+    `,
+      replacements
+    );
+
+    // const qb = getConnection()
+    //   .getRepository(Post)
+    //   .createQueryBuilder("p")
+    //   .innerJoinAndSelect("p.creator", "u", 'u.id = p."creatorId"', {})
+    //   .orderBy('p."createdAt"', "DESC")
+    //   .take(realLimitPlusOne);
+
+    // if (cursor) {
+    //   qb.where('p."createdAt" < :cursor', {
+    //     cursor: new Date(parseInt(cursor)),
+    //   });
+    // }
+
+    // const posts = await qb.getMany();
+
+    return {
+      posts: posts.slice(0, realLimit),
+      hasMore: posts.length === realLimitPlusOne,
+    };
   }
 
   @Query(() => Post, { nullable: true })
