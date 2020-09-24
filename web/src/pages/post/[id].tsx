@@ -1,21 +1,13 @@
+import { Flex, Heading, Text } from "@chakra-ui/core";
 import { withUrqlClient } from "next-urql";
 import React from "react";
-import { createUrqlClient } from "../../utils/createUrqlClient";
-import { useRouter } from "next/router";
-import { usePostQuery } from "../../generated/graphql";
+import { EditDeletePostButtons } from "../../components/EditDeletePostButtons";
 import { Layout } from "../../components/Layout";
-import { Heading, Text } from "@chakra-ui/core";
+import { createUrqlClient } from "../../utils/createUrqlClient";
+import { useGetPostFromUrl } from "../../utils/useGetPostFromUrl";
 
 const Post: React.FC<{}> = ({}) => {
-  const router = useRouter();
-  const intId =
-    typeof router.query.id === "string" ? parseInt(router.query.id) : -1;
-  const [{ data, fetching }] = usePostQuery({
-    pause: intId === -1,
-    variables: {
-      id: intId,
-    },
-  });
+  const [{ data, fetching }] = useGetPostFromUrl();
 
   if (fetching) {
     return (
@@ -35,7 +27,14 @@ const Post: React.FC<{}> = ({}) => {
 
   return (
     <Layout title={data.post.title}>
-      <Heading mb={8}>{data.post.title}</Heading>
+      <Flex mb={8} align="center">
+        <Heading flex={1}>{data.post.title}</Heading>
+        <EditDeletePostButtons
+          id={data.post.id}
+          creatorId={data.post.creator.id}
+        />
+      </Flex>
+
       <Text>{data.post.text}</Text>
     </Layout>
   );

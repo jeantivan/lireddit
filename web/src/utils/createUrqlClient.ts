@@ -1,6 +1,10 @@
 import { isServer } from "./isServer";
 import gql from "graphql-tag";
-import { Query, VoteMutationVariables } from "./../generated/graphql";
+import {
+  DeletePostByIdMutationVariables,
+  Query,
+  VoteMutationVariables,
+} from "./../generated/graphql";
 import { cacheExchange, Resolver } from "@urql/exchange-graphcache";
 import Router from "next/router";
 import {
@@ -130,7 +134,7 @@ const cursorPagination = (): Resolver => {
 export const createUrqlClient = (ssrExchange: any, ctx: any) => {
   let cookie = "";
   if (isServer()) {
-    cookie = ctx.req.headers.cookie;
+    cookie = ctx?.req?.headers?.cookie;
   }
 
   return {
@@ -156,6 +160,12 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
         },
         updates: {
           Mutation: {
+            deletePostById: (_result, args, cache, info) => {
+              cache.invalidate({
+                __typename: "Post",
+                id: (args as DeletePostByIdMutationVariables).id,
+              });
+            },
             vote: (_result, args, cache, info) => {
               const { postId, value } = args as VoteMutationVariables;
 

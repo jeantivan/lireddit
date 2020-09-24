@@ -34,5 +34,10 @@
   ],
   "exclude": [
     "node_modules"
-  ]
+  ],
+  /* Absolute Imports and Module path aliases */
+  //"baseUrl": ".",
+  /* "paths": {
+    "@/components/*": ["components/*"]
+  } */
 }
