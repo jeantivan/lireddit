@@ -1,11 +1,14 @@
-import { isServer } from "./isServer";
-import gql from "graphql-tag";
 import {
   DeletePostByIdMutationVariables,
-  Query,
+  LoginMutation,
+  LogoutMutation,
+  MeDocument,
+  MeQuery,
+  RegisterMutation,
   VoteMutationVariables,
-} from "./../generated/graphql";
+} from "@/generated/graphql";
 import { cacheExchange, Resolver } from "@urql/exchange-graphcache";
+import gql from "graphql-tag";
 import Router from "next/router";
 import {
   dedupExchange,
@@ -14,14 +17,8 @@ import {
   stringifyVariables,
 } from "urql";
 import { pipe, tap } from "wonka";
-import {
-  LoginMutation,
-  LogoutMutation,
-  MeDocument,
-  MeQuery,
-  RegisterMutation,
-} from "../generated/graphql";
 import { betterUpdateQuery } from "./betterUpdateQuery";
+import { isServer } from "./isServer";
 
 export const errorExchange: Exchange = ({ forward }) => (ops$) => {
   return pipe(

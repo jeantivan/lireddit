@@ -1,14 +1,13 @@
+import { useDeletePostByIdMutation, useMeQuery } from "@/generated/graphql";
 import { Box, IconButton, Link } from "@chakra-ui/core";
 import NextLink from "next/link";
-import React from "react";
-import { useDeletePostByIdMutation, useMeQuery } from "../generated/graphql";
 
 interface EditDeletePostButtonsProps {
   id: number;
   creatorId: number;
 }
 
-const EditDeletePostButtons: React.FC<EditDeletePostButtonsProps> = ({
+export const EditDeletePostButtons: React.FC<EditDeletePostButtonsProps> = ({
   id,
   creatorId,
 }) => {
@@ -45,5 +44,3 @@ const EditDeletePostButtons: React.FC<EditDeletePostButtonsProps> = ({
     </Box>
   );
 };
-
-export default EditDeletePostButtons;

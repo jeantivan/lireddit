@@ -25,7 +25,14 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    /* Absolute Imports and Module path aliases */
+    "baseUrl": ".",
+    "paths": {
+      "@/components/*": ["src/components/*"],
+      "@/utils/*": ["src/utils/*"],
+      "@/generated/*": ["src/generated/*"],
+    }
   },
   "include": [
     "next-env.d.ts",
@@ -35,9 +42,5 @@
   "exclude": [
     "node_modules"
   ],
-  /* Absolute Imports and Module path aliases */
-  //"baseUrl": ".",
-  /* "paths": {
-    "@/components/*": ["components/*"]
-  } */
+
 }

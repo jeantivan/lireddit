@@ -1,7 +1,6 @@
-import React from "react";
 import Head from "next/head";
-import { Wrapper, WrapperVariant } from "./Wrapper";
 import { Navbar } from "./Navbar";
+import { Wrapper, WrapperVariant } from "./Wrapper";
 
 interface LayoutProps {
   title?: string;

@@ -1,6 +1,6 @@
-import { Flex, Box, IconButton, Text } from "@chakra-ui/core";
-import React, { useState } from "react";
-import { PostSnippetFragment, useVoteMutation } from "../generated/graphql";
+import { PostSnippetFragment, useVoteMutation } from "@/generated/graphql";
+import { Box, Flex, IconButton, Text } from "@chakra-ui/core";
+import { useState } from "react";
 
 interface UpdootSectionProps {
   post: PostSnippetFragment;

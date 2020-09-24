@@ -1,12 +1,12 @@
+import { EditDeletePostButtons } from "@/components/EditDeletePostButtons";
+import { Layout } from "@/components/Layout";
+import { UpdootSection } from "@/components/UpdootSection";
+import { usePostsQuery } from "@/generated/graphql";
+import { createUrqlClient } from "@/utils/createUrqlClient";
 import { Box, Button, Flex, Heading, Link, Stack, Text } from "@chakra-ui/core";
 import { withUrqlClient } from "next-urql";
 import NextLink from "next/link";
-import React, { useState } from "react";
-import EditDeletePostButtons from "../components/EditDeletePostButtons";
-import { Layout } from "../components/Layout";
-import { UpdootSection } from "../components/UpdootSection";
-import { usePostsQuery } from "../generated/graphql";
-import { createUrqlClient } from "../utils/createUrqlClient";
+import { useState } from "react";
 
 const Index = () => {
   const [variables, setVariables] = useState({

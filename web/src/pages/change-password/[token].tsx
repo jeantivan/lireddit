@@ -1,3 +1,8 @@
+import { InputField } from "@/components/InputField";
+import { Layout } from "@/components/Layout";
+import { useChangePasswordMutation } from "@/generated/graphql";
+import { createUrqlClient } from "@/utils/createUrqlClient";
+import { toErrorMap } from "@/utils/toErrorMap";
 import { Box, Button, Flex, Link } from "@chakra-ui/core";
 import { Form, Formik } from "formik";
 import { NextPage } from "next";
@@ -5,11 +10,6 @@ import { withUrqlClient } from "next-urql";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { InputField } from "../../components/InputField";
-import { Layout } from "../../components/Layout";
-import { useChangePasswordMutation } from "../../generated/graphql";
-import { createUrqlClient } from "../../utils/createUrqlClient";
-import { toErrorMap } from "../../utils/toErrorMap";
 
 const ChangePassword: NextPage = () => {
   const router = useRouter();
