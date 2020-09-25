@@ -13,7 +13,7 @@ import {
   Root,
   UseMiddleware,
 } from "type-graphql";
-import { getConnection, Index } from "typeorm";
+import { getConnection } from "typeorm";
 import { MyContext } from "../types";
 import { Post } from "./../entities/Post";
 import { Updoot } from "./../entities/Updoot";
@@ -136,8 +136,7 @@ export class PostResolver {
   @Query(() => PaginatedPosts)
   async posts(
     @Arg("limit", () => Int) limit: number,
-    @Arg("cursor", () => String, { nullable: true }) cursor: string | null,
-    @Ctx() { req }: MyContext
+    @Arg("cursor", () => String, { nullable: true }) cursor: string | null
   ): Promise<PaginatedPosts> {
     const realLimit = Math.min(50, limit) + 1;
     const realLimitPlusOne = realLimit + 1;
