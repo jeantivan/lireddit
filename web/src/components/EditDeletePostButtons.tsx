@@ -1,5 +1,6 @@
 import { useDeletePostByIdMutation, useMeQuery } from "@/generated/graphql";
-import { Box, IconButton, Link } from "@chakra-ui/core";
+import { Box, IconButton, Link } from "@chakra-ui/react";
+import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
 import NextLink from "next/link";
 
 interface EditDeletePostButtonsProps {
@@ -25,8 +26,8 @@ export const EditDeletePostButtons: React.FC<EditDeletePostButtonsProps> = ({
           mr={2}
           as={Link}
           variant="ghost"
-          icon="edit"
-          variantColor="cyan"
+          icon={<EditIcon />}
+          colorScheme="cyan"
           aria-label="Edit post"
         />
       </NextLink>
@@ -34,8 +35,8 @@ export const EditDeletePostButtons: React.FC<EditDeletePostButtonsProps> = ({
       <IconButton
         isRound
         variant="ghost"
-        icon="delete"
-        variantColor="red"
+        icon={<DeleteIcon />}
+        colorScheme="red"
         aria-label="Delete post"
         onClick={() => {
           deletePostById({

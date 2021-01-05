@@ -2,7 +2,7 @@ import { EditDeletePostButtons } from "@/components/EditDeletePostButtons";
 import { Layout } from "@/components/Layout";
 import { useGetPostFromUrl } from "@/utils/useGetPostFromUrl";
 import { withApollo } from "@/utils/withApollo";
-import { Flex, Heading, Text } from "@chakra-ui/core";
+import { Flex, Heading, Text } from "@chakra-ui/react";
 
 const Post: React.FC<{}> = ({}) => {
   const { data, loading } = useGetPostFromUrl();

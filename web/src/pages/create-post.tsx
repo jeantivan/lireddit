@@ -3,7 +3,7 @@ import { Layout } from "@/components/Layout";
 import { useCreatePostMutation } from "@/generated/graphql";
 import { useIsAuth } from "@/utils/useIsAuth";
 import { withApollo } from "@/utils/withApollo";
-import { Box, Button } from "@chakra-ui/core";
+import { Box, Button } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import { useRouter } from "next/router";
 
@@ -43,7 +43,7 @@ const CreatePost: React.FC<{}> = ({}) => {
             <Button
               isLoading={isSubmitting}
               mt={4}
-              variantColor="teal"
+              colorScheme="teal"
               type="submit"
             >
               Create Post

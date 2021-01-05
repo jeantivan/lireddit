@@ -9,7 +9,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import React from "react";
 import { InputField } from "./InputField";
@@ -65,7 +65,7 @@ export const EditProfile: React.FC<EditProfileProps> = ({
               </ModalBody>
 
               <ModalFooter>
-                <Button isLoading={isSubmitting} variantColor="teal">
+                <Button isLoading={isSubmitting} colorScheme="teal">
                   Guardar
                 </Button>
               </ModalFooter>

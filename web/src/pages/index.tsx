@@ -2,7 +2,7 @@ import { Layout } from "@/components/Layout";
 import { Post } from "@/components/Post";
 import { usePostsQuery } from "@/generated/graphql";
 import { withApollo } from "@/utils/withApollo";
-import { Button, Flex, Stack } from "@chakra-ui/core";
+import { Button, Flex, Stack } from "@chakra-ui/react";
 import React from "react";
 
 const Index = () => {

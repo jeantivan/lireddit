@@ -2,7 +2,7 @@ import { InputField } from "@/components/InputField";
 import { Layout } from "@/components/Layout";
 import { useForgotPasswordMutation } from "@/generated/graphql";
 import { withApollo } from "@/utils/withApollo";
-import { Box, Button, Link } from "@chakra-ui/core";
+import { Box, Button, Link } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import NextLink from "next/link";
 import { useState } from "react";
@@ -41,7 +41,7 @@ const ForgotPassword: React.FC<{}> = ({}) => {
               <Button
                 isLoading={isSubmitting}
                 mt={4}
-                variantColor="teal"
+                colorScheme="teal"
                 type="submit"
               >
                 Forgot password

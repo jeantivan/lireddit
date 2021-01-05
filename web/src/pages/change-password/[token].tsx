@@ -7,7 +7,7 @@ import {
 } from "@/generated/graphql";
 import { toErrorMap } from "@/utils/toErrorMap";
 import { withApollo } from "@/utils/withApollo";
-import { Box, Button, Flex, Link } from "@chakra-ui/core";
+import { Box, Button, Flex, Link } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import { NextPage } from "next";
 import NextLink from "next/link";
@@ -76,7 +76,7 @@ const ChangePassword: NextPage = () => {
             <Button
               isLoading={isSubmitting}
               mt={4}
-              variantColor="teal"
+              colorScheme="teal"
               type="submit"
             >
               Change password

@@ -1,5 +1,5 @@
 import { PostSnippetFragment } from "@/generated/graphql";
-import { Box, Flex, Heading, Link, PseudoBox, Text } from "@chakra-ui/core";
+import { Box, Flex, Heading, Link, Text } from "@chakra-ui/react";
 import NextLink from "next/link";
 import React from "react";
 import { EditDeletePostButtons } from "./EditDeletePostButtons";
@@ -11,7 +11,7 @@ interface PostProps {
 
 export const Post: React.FC<PostProps> = ({ post }) => {
   return (
-    <PseudoBox borderWidth="1px" mb={6} _hover={{ shadow: "md" }}>
+    <Box borderWidth="1px" mb={6} _hover={{ shadow: "md" }}>
       <Flex p={4}>
         <UpdootSection post={post} />
         <Box flex={1}>
@@ -38,6 +38,6 @@ export const Post: React.FC<PostProps> = ({ post }) => {
           <Text mt={4}>{post.textSnippet}</Text>
         </Box>
       </Flex>
-    </PseudoBox>
+    </Box>
   );
 };

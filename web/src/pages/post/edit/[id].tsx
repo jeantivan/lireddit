@@ -3,7 +3,7 @@ import { Layout } from "@/components/Layout";
 import { usePostQuery, useUpdatePostMutation } from "@/generated/graphql";
 import { useGetIntId } from "@/utils/useGetIntId";
 import { withApollo } from "@/utils/withApollo";
-import { Box, Button } from "@chakra-ui/core";
+import { Box, Button } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import { useRouter } from "next/router";
 
@@ -61,7 +61,7 @@ const EditPost: React.FC<{}> = ({}) => {
             <Button
               isLoading={isSubmitting}
               mt={4}
-              variantColor="teal"
+              colorScheme="teal"
               type="submit"
             >
               Update Post

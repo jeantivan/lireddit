@@ -21,7 +21,7 @@ import {
   Tabs,
   Text,
   useDisclosure,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import React from "react";
 
 const URL_PREFIX = "http://localhost:4000";
@@ -111,7 +111,7 @@ const Profile: React.FC<{}> = ({}) => {
                     icon="edit"
                     aria-label="Edit profile"
                     variant="outline"
-                    variantColor="teal"
+                    colorScheme="teal"
                     isRound
                     onClick={onOpen}
                   />
@@ -124,7 +124,7 @@ const Profile: React.FC<{}> = ({}) => {
         </Box>
       </Flex>
       <Box p={4}>
-        <Tabs isFitted variantColor="teal">
+        <Tabs isFitted colorScheme="teal">
           <TabList mb={4}>
             <Tab fontSize="xl" mr={2}>
               Posts

@@ -1,6 +1,7 @@
 import { useLogoutMutation, useMeQuery } from "@/generated/graphql";
 import { isServer } from "@/utils/isServer";
 import { useApolloClient } from "@apollo/client";
+import { AddIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -14,7 +15,7 @@ import {
   MenuList,
   Tooltip,
   Image,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import NextLink from "next/link";
 import React from "react";
 
@@ -32,12 +33,12 @@ export const Navbar: React.FC<{}> = ({}) => {
     body = (
       <>
         <NextLink href="/login" passHref>
-          <Button size="sm" as="a" variant="outline" variantColor="teal" mr={4}>
+          <Button size="sm" as="a" variant="outline" colorScheme="teal" mr={4}>
             Login
           </Button>
         </NextLink>
         <NextLink href="/register" passHref>
-          <Button size="sm" as="a" variantColor="teal">
+          <Button size="sm" as="a" colorScheme="teal">
             Register
           </Button>
         </NextLink>
@@ -49,10 +50,11 @@ export const Navbar: React.FC<{}> = ({}) => {
         <Menu>
           <MenuButton as={Button} borderRadius="4rem">
             <Image
-              ml={-3}
-              mr={4}
+              ml={-2}
+              mr={2}
               d="inline-block"
-              size="32px"
+              width="32px"
+              height="32px"
               borderRadius="100%"
               src={process.env.NEXT_PUBLIC_URL + data.me.profile!.imageUrl}
             />
@@ -111,10 +113,9 @@ export const Navbar: React.FC<{}> = ({}) => {
                 zIndex={101}
               >
                 <IconButton
-                  icon="add"
+                  icon={<AddIcon />}
                   isRound
                   mr={4}
-                  size="sm"
                   aria-label="Create Post"
                   as="a"
                   href="/create-post"

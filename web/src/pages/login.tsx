@@ -3,7 +3,7 @@ import { Layout } from "@/components/Layout";
 import { MeDocument, MeQuery, useLoginMutation } from "@/generated/graphql";
 import { toErrorMap } from "@/utils/toErrorMap";
 import { withApollo } from "@/utils/withApollo";
-import { Box, Button, Flex, Link } from "@chakra-ui/core";
+import { Box, Button, Flex, Link } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
@@ -66,7 +66,7 @@ const Login: React.FC<{}> = ({}) => {
             <Button
               isLoading={isSubmitting}
               mt={4}
-              variantColor="teal"
+              colorScheme="teal"
               type="submit"
             >
               Login

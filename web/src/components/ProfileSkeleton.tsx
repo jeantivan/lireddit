@@ -1,4 +1,4 @@
-import { Box, Flex, Skeleton } from "@chakra-ui/core";
+import { Box, Flex, Skeleton } from "@chakra-ui/react";
 import React from "react";
 
 export const ProfileSkeleton: React.FC = ({}) => {
