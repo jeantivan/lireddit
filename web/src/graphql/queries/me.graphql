@@ -1,5 +1,9 @@
 query Me {
   me {
     ...RegularUser
+    profile {
+      fullName
+      imageUrl
+    }
   }
 }

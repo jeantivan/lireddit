@@ -11,27 +11,37 @@ import { buildSchema } from "type-graphql";
 import { createConnection } from "typeorm";
 import { COOKIE_NAME, __prod__ } from "./constants";
 import { Post } from "./entities/Post";
+import { PostImage } from "./entities/PostImage";
+import { Profile } from "./entities/Profile";
 import { Updoot } from "./entities/Updoot";
 import { User } from "./entities/User";
+import { createUpdootLoader } from "./loaders/createUpdootLoader";
+import { createUserLoader } from "./loaders/createUserLoader";
 import { HelloResolver } from "./resolvers/hello";
 import { PostResolver } from "./resolvers/post";
+import { ProfileResolver } from "./resolvers/profile";
+import { UpdootResolver } from "./resolvers/updoot";
 import { UserResolver } from "./resolvers/user";
-import { createUpdootLoader } from "./utils/createUpdootLoader";
-import { createUserLoader } from "./utils/createUserLoader";
 
 async function main() {
   const conn = await createConnection({
     type: "postgres",
     url: process.env.DATABASE_URL,
     logging: true,
-    // synchronize: true,
+    synchronize: true,
     migrations: [path.join(__dirname, "./migrations/*")],
-    entities: [Post, User, Updoot],
+    entities: [Post, User, Updoot, Profile, PostImage],
   });
 
-  // await conn.runMigrations();
+  // Post.delete({});
+  // User.delete({});
+  // Updoot.delete({});
+
+  await conn.runMigrations();
 
   const app = express();
+
+  app.use(express.static(path.join(__dirname, "../public")));
 
   const RedisStore = connectRedis(session);
   const redis = new Redis(process.env.REDIS_URL);
@@ -63,7 +73,13 @@ async function main() {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [HelloResolver, PostResolver, UserResolver],
+      resolvers: [
+        HelloResolver,
+        PostResolver,
+        UserResolver,
+        ProfileResolver,
+        UpdootResolver,
+      ],
       validate: false,
     }),
     context: ({ req, res }) => ({
@@ -82,6 +98,7 @@ async function main() {
 
   app.listen(parseInt(process.env.PORT), () => {
     console.log("Server started on localhost:4000");
+    console.log(path.join(__dirname, "public"));
   });
 }
 

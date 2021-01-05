@@ -1,10 +1,9 @@
-import { EditDeletePostButtons } from "@/components/EditDeletePostButtons";
 import { Layout } from "@/components/Layout";
-import { UpdootSection } from "@/components/UpdootSection";
+import { Post } from "@/components/Post";
 import { usePostsQuery } from "@/generated/graphql";
 import { withApollo } from "@/utils/withApollo";
-import { Box, Button, Flex, Heading, Link, Stack, Text } from "@chakra-ui/core";
-import NextLink from "next/link";
+import { Button, Flex, Stack } from "@chakra-ui/core";
+import React from "react";
 
 const Index = () => {
   const { data, error, loading, fetchMore, variables } = usePostsQuery({
@@ -31,28 +30,7 @@ const Index = () => {
       ) : (
         <Stack spacing={8}>
           {data!.posts.posts.map((p) =>
-            !p ? null : (
-              <Flex key={p.id} p={4} shadow="md" borderWidth="1px">
-                <UpdootSection post={p} />
-                <Box flex={1}>
-                  <Flex>
-                    <Box flex={1}>
-                      <NextLink href="/post/[id]" as={`/post/${p.id}`} passHref>
-                        <Heading as={Link} fontSize="xl">
-                          {p.title}
-                        </Heading>
-                      </NextLink>
-                      <Text fontSize="sm" color="gray.400">
-                        posted by: {p.creator.username}
-                      </Text>
-                    </Box>
-                    <EditDeletePostButtons id={p.id} creatorId={p.creator.id} />
-                  </Flex>
-
-                  <Text mt={4}>{p.textSnippet}</Text>
-                </Box>
-              </Flex>
-            )
+            !p ? null : <Post post={p} key={p.id} />
           )}
         </Stack>
       )}

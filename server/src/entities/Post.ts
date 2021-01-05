@@ -11,6 +11,7 @@ import {
 } from "typeorm";
 import { Updoot } from "./Updoot";
 import { User } from "./User";
+import { PostImage } from "./PostImage";
 
 @ObjectType()
 @Entity()
@@ -24,7 +25,7 @@ export class Post extends BaseEntity {
   title!: string;
 
   @Field()
-  @Column()
+  @Column("text")
   text!: string;
 
   @Field()
@@ -44,6 +45,9 @@ export class Post extends BaseEntity {
 
   @OneToMany(() => Updoot, (updoot) => updoot.post)
   updoots: Updoot[];
+
+  @OneToMany(() => PostImage, (image) => image.post)
+  images: PostImage[];
 
   @Field(() => String)
   @CreateDateColumn()

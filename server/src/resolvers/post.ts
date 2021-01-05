@@ -1,4 +1,3 @@
-import { User } from "./../entities/User";
 import {
   Arg,
   Ctx,
@@ -7,7 +6,6 @@ import {
   InputType,
   Int,
   Mutation,
-  ObjectType,
   Query,
   Resolver,
   Root,
@@ -15,9 +13,11 @@ import {
 } from "type-graphql";
 import { getConnection } from "typeorm";
 import { MyContext } from "../types";
-import { Post } from "./../entities/Post";
-import { Updoot } from "./../entities/Updoot";
-import { isAuth } from "./../middleware/isAuth";
+import { Post } from "../entities/Post";
+import { Updoot } from "../entities/Updoot";
+import { User } from "../entities/User";
+import { isAuth } from "../middleware/isAuth";
+import { PaginatedPosts } from "../utils/PaginatedPosts";
 
 @InputType()
 class PostInput {
@@ -27,20 +27,11 @@ class PostInput {
   text: string;
 }
 
-@ObjectType()
-class PaginatedPosts {
-  @Field(() => [Post])
-  posts: Post[];
-
-  @Field()
-  hasMore: boolean;
-}
-
 @Resolver(Post)
 export class PostResolver {
   @FieldResolver(() => String)
   textSnippet(@Root() root: Post) {
-    return root.text.slice(0, 50);
+    return root.text.slice(0, 50) + "...";
   }
 
   @FieldResolver(() => User)
@@ -150,7 +141,6 @@ export class PostResolver {
     const posts = await getConnection().query(
       `
       select p.*
-      
       from post p
       ${cursor ? `where p."createdAt" < $2` : ""}
       order by p."createdAt" DESC
@@ -168,6 +158,41 @@ export class PostResolver {
   @Query(() => Post, { nullable: true })
   post(@Arg("id", () => Int) id: number): Promise<Post | undefined> {
     return Post.findOne(id);
+  }
+
+  @Query(() => PaginatedPosts)
+  async postsByUserId(
+    @Arg("userId", () => Int) userId: number,
+    @Arg("limit", () => Int) limit: number,
+    @Arg("cursor", () => String, { nullable: true }) cursor: string | null
+  ) {
+    const realLimit = Math.min(50, limit) + 1;
+    const realLimitPlusOne = realLimit + 1;
+
+    const replacements: any[] = [realLimitPlusOne, userId];
+
+    if (cursor) {
+      replacements.push(new Date(parseInt(cursor)));
+    }
+
+    const posts = await getConnection().query(
+      `
+      select p.*
+      from post p
+      where 
+      ${cursor ? `p."createdAt" < $3 and ` : ""}
+      p."creatorId" = $2
+      
+      order by p."createdAt" DESC
+      limit $1
+    `,
+      replacements
+    );
+
+    return {
+      posts: posts.slice(0, realLimit),
+      hasMore: posts.length === realLimitPlusOne,
+    };
   }
 
   @Mutation(() => Post)

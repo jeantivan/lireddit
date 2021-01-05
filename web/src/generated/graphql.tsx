@@ -9,6 +9,8 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
+  DateTime: any;
 };
 
 export type Query = {
@@ -16,6 +18,8 @@ export type Query = {
   hello: Scalars['String'];
   posts: PaginatedPosts;
   post?: Maybe<Post>;
+  postsByUserId: PaginatedPosts;
+  userProfile?: Maybe<Profile>;
   me?: Maybe<User>;
 };
 
@@ -28,6 +32,18 @@ export type QueryPostsArgs = {
 
 export type QueryPostArgs = {
   id: Scalars['Int'];
+};
+
+
+export type QueryPostsByUserIdArgs = {
+  cursor?: Maybe<Scalars['String']>;
+  limit: Scalars['Int'];
+  userId: Scalars['Int'];
+};
+
+
+export type QueryUserProfileArgs = {
+  username: Scalars['String'];
 };
 
 export type PaginatedPosts = {
@@ -52,9 +68,33 @@ export type Post = {
 
 export type User = {
   __typename?: 'User';
-  id: Scalars['Float'];
+  id: Scalars['Int'];
   username: Scalars['String'];
   email: Scalars['String'];
+  posts?: Maybe<Array<Post>>;
+  updoots?: Maybe<Array<Updoot>>;
+  profile?: Maybe<Profile>;
+  upvotes?: Maybe<Scalars['Int']>;
+  downvotes?: Maybe<Scalars['Int']>;
+  createdAt: Scalars['String'];
+  updatedAt: Scalars['String'];
+};
+
+export type Updoot = {
+  __typename?: 'Updoot';
+  value: Scalars['Int'];
+  user: User;
+  post: Post;
+};
+
+export type Profile = {
+  __typename?: 'Profile';
+  id: Scalars['Int'];
+  fullName: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
+  birthday?: Maybe<Scalars['String']>;
+  imageUrl: Scalars['String'];
+  user: User;
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
 };
@@ -65,6 +105,7 @@ export type Mutation = {
   createPost: Post;
   updatePost?: Maybe<Post>;
   deletePostById: Scalars['Boolean'];
+  createProfile: ProfileResponse;
   register: UserResponse;
   login: UserResponse;
   logout: Scalars['Boolean'];
@@ -96,6 +137,11 @@ export type MutationDeletePostByIdArgs = {
 };
 
 
+export type MutationCreateProfileArgs = {
+  options: ProfileInput;
+};
+
+
 export type MutationRegisterArgs = {
   options: UsernamePasswordInput;
 };
@@ -122,16 +168,30 @@ export type PostInput = {
   text: Scalars['String'];
 };
 
-export type UserResponse = {
-  __typename?: 'UserResponse';
+export type ProfileResponse = {
+  __typename?: 'ProfileResponse';
   errors?: Maybe<Array<FieldError>>;
-  user?: Maybe<User>;
+  profile?: Maybe<Profile>;
 };
 
 export type FieldError = {
   __typename?: 'FieldError';
   field: Scalars['String'];
   message: Scalars['String'];
+};
+
+export type ProfileInput = {
+  fullName: Scalars['String'];
+  imageUrl?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  birthday?: Maybe<Scalars['DateTime']>;
+};
+
+
+export type UserResponse = {
+  __typename?: 'UserResponse';
+  errors?: Maybe<Array<FieldError>>;
+  user?: Maybe<User>;
 };
 
 export type UsernamePasswordInput = {
@@ -285,6 +345,10 @@ export type MeQuery = (
   { __typename?: 'Query' }
   & { me?: Maybe<(
     { __typename?: 'User' }
+    & { profile?: Maybe<(
+      { __typename?: 'Profile' }
+      & Pick<Profile, 'fullName' | 'imageUrl'>
+    )> }
     & RegularUserFragment
   )> }
 );
@@ -322,6 +386,53 @@ export type PostsQuery = (
       & PostSnippetFragment
     )> }
   ) }
+);
+
+export type PostsByUserQueryVariables = Exact<{
+  userId: Scalars['Int'];
+  limit: Scalars['Int'];
+  cursor?: Maybe<Scalars['String']>;
+}>;
+
+
+export type PostsByUserQuery = (
+  { __typename?: 'Query' }
+  & { postsByUserId: (
+    { __typename?: 'PaginatedPosts' }
+    & Pick<PaginatedPosts, 'hasMore'>
+    & { posts: Array<(
+      { __typename?: 'Post' }
+      & PostSnippetFragment
+    )> }
+  ) }
+);
+
+export type UserProfileQueryVariables = Exact<{
+  username: Scalars['String'];
+}>;
+
+
+export type UserProfileQuery = (
+  { __typename?: 'Query' }
+  & { userProfile?: Maybe<(
+    { __typename?: 'Profile' }
+    & Pick<Profile, 'fullName' | 'birthday' | 'description' | 'imageUrl'>
+    & { user: (
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'username'>
+      & { posts?: Maybe<Array<(
+        { __typename?: 'Post' }
+        & PostSnippetFragment
+      )>>, updoots?: Maybe<Array<(
+        { __typename?: 'Updoot' }
+        & Pick<Updoot, 'value'>
+        & { post: (
+          { __typename?: 'Post' }
+          & PostSnippetFragment
+        ) }
+      )>> }
+    ) }
+  )> }
 );
 
 export const PostSnippetFragmentDoc = gql`
@@ -659,6 +770,10 @@ export const MeDocument = gql`
     query Me {
   me {
     ...RegularUser
+    profile {
+      fullName
+      imageUrl
+    }
   }
 }
     ${RegularUserFragmentDoc}`;
@@ -767,3 +882,90 @@ export function usePostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Post
 export type PostsQueryHookResult = ReturnType<typeof usePostsQuery>;
 export type PostsLazyQueryHookResult = ReturnType<typeof usePostsLazyQuery>;
 export type PostsQueryResult = Apollo.QueryResult<PostsQuery, PostsQueryVariables>;
+export const PostsByUserDocument = gql`
+    query PostsByUser($userId: Int!, $limit: Int!, $cursor: String) {
+  postsByUserId(userId: $userId, limit: $limit, cursor: $cursor) {
+    hasMore
+    posts {
+      ...PostSnippet
+    }
+  }
+}
+    ${PostSnippetFragmentDoc}`;
+
+/**
+ * __usePostsByUserQuery__
+ *
+ * To run a query within a React component, call `usePostsByUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePostsByUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePostsByUserQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *      limit: // value for 'limit'
+ *      cursor: // value for 'cursor'
+ *   },
+ * });
+ */
+export function usePostsByUserQuery(baseOptions?: Apollo.QueryHookOptions<PostsByUserQuery, PostsByUserQueryVariables>) {
+        return Apollo.useQuery<PostsByUserQuery, PostsByUserQueryVariables>(PostsByUserDocument, baseOptions);
+      }
+export function usePostsByUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PostsByUserQuery, PostsByUserQueryVariables>) {
+          return Apollo.useLazyQuery<PostsByUserQuery, PostsByUserQueryVariables>(PostsByUserDocument, baseOptions);
+        }
+export type PostsByUserQueryHookResult = ReturnType<typeof usePostsByUserQuery>;
+export type PostsByUserLazyQueryHookResult = ReturnType<typeof usePostsByUserLazyQuery>;
+export type PostsByUserQueryResult = Apollo.QueryResult<PostsByUserQuery, PostsByUserQueryVariables>;
+export const UserProfileDocument = gql`
+    query UserProfile($username: String!) {
+  userProfile(username: $username) {
+    fullName
+    birthday
+    description
+    imageUrl
+    user {
+      id
+      username
+      posts {
+        ...PostSnippet
+      }
+      updoots {
+        value
+        post {
+          ...PostSnippet
+        }
+      }
+    }
+  }
+}
+    ${PostSnippetFragmentDoc}`;
+
+/**
+ * __useUserProfileQuery__
+ *
+ * To run a query within a React component, call `useUserProfileQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUserProfileQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUserProfileQuery({
+ *   variables: {
+ *      username: // value for 'username'
+ *   },
+ * });
+ */
+export function useUserProfileQuery(baseOptions?: Apollo.QueryHookOptions<UserProfileQuery, UserProfileQueryVariables>) {
+        return Apollo.useQuery<UserProfileQuery, UserProfileQueryVariables>(UserProfileDocument, baseOptions);
+      }
+export function useUserProfileLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserProfileQuery, UserProfileQueryVariables>) {
+          return Apollo.useLazyQuery<UserProfileQuery, UserProfileQueryVariables>(UserProfileDocument, baseOptions);
+        }
+export type UserProfileQueryHookResult = ReturnType<typeof useUserProfileQuery>;
+export type UserProfileLazyQueryHookResult = ReturnType<typeof useUserProfileLazyQuery>;
+export type UserProfileQueryResult = Apollo.QueryResult<UserProfileQuery, UserProfileQueryVariables>;

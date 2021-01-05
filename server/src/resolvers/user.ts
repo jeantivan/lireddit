@@ -1,31 +1,28 @@
-import { validateRegister } from "./../utils/validateRegister";
-import { COOKIE_NAME, FORGET_PASSWORD_PREFIX } from "./../constants";
-import { MyContext } from "./../types";
-import { User } from "./../entities/User";
+//import { Profile } from "./../entities/Profile";
+import argon2 from "argon2";
 import {
-  Resolver,
-  Query,
-  Field,
-  Mutation,
   Arg,
   Ctx,
-  ObjectType,
+  Field,
   FieldResolver,
+  Mutation,
+  ObjectType,
+  Query,
+  Resolver,
   Root,
 } from "type-graphql";
-import argon2 from "argon2";
-import { UsernamePasswordInput } from "./UsernamePasswordInput";
-import { sendEmail } from "../utils/sendEmail";
-import { v4 } from "uuid";
 import { getConnection } from "typeorm";
-
-@ObjectType()
-class FieldError {
-  @Field()
-  field: string;
-  @Field()
-  message: string;
-}
+import { v4 } from "uuid";
+import { UsernamePasswordInput } from "../inputs/UsernamePasswordInput";
+import { sendEmail } from "../utils/sendEmail";
+import { COOKIE_NAME, FORGET_PASSWORD_PREFIX } from "./../constants";
+import { Post } from "./../entities/Post";
+import { Profile } from "./../entities/Profile";
+import { Updoot } from "./../entities/Updoot";
+import { User } from "./../entities/User";
+import { FieldError } from "./../helpers";
+import { MyContext } from "./../types";
+import { validateRegister } from "./../utils/validateRegister";
 
 @ObjectType()
 class UserResponse {
@@ -49,14 +46,48 @@ export class UserResolver {
     return "";
   }
 
+  @FieldResolver(() => Post)
+  async posts(@Root() user: User): Promise<Post[] | null> {
+    const posts = await Post.find({ where: { creatorId: user.id } });
+    return posts;
+  }
+
+  @FieldResolver(() => Profile)
+  async profile(@Root() user: User): Promise<Profile | null> {
+    const profile = await Profile.findOne({ where: { user: user.id } });
+
+    if (!profile) {
+      return null;
+    }
+
+    return profile;
+  }
+
+  @FieldResolver(() => [Updoot])
+  async updoots(@Root() user: User): Promise<Updoot[] | null> {
+    console.log(user);
+    const updoots = await User.findOne({
+      where: { id: user.id },
+      relations: ["updoots"],
+    });
+
+    if (!updoots) {
+      return null;
+    }
+
+    return updoots.updoots;
+  }
+
   @Query(() => User, { nullable: true })
-  me(@Ctx() { req }: MyContext) {
+  async me(@Ctx() { req }: MyContext) {
     // no estas logeado
     if (!req.session.userId) {
       return null;
     }
 
-    return User.findOne({ id: req.session!.userId });
+    const user = await User.findOne(req.session!.userId);
+
+    return user;
   }
 
   @Mutation(() => UserResponse)
