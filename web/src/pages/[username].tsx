@@ -6,6 +6,7 @@ import { useMeQuery, useUserProfileQuery } from "@/generated/graphql";
 import { isServer } from "@/utils/isServer";
 import { useGetUsername } from "@/utils/useGetUsername";
 import { withApollo } from "@/utils/withApollo";
+import { ChevronDownIcon, EditIcon } from "@chakra-ui/icons";
 import {
   Box,
   Flex,
@@ -86,11 +87,11 @@ const Profile: React.FC<{}> = ({}) => {
             <Text fontSize="md">Votes</Text>
             <Flex>
               <Text flex={1} fontWeight="bolder" fontSize="lg">
-                <Icon color="green.500" name="chevron-up" mr={1} />
+                <ChevronDownIcon color="green.500" mr={1} />
                 {upvotes}
               </Text>
               <Text flex={1} fontWeight="bold" fontSize="lg">
-                <Icon color="red.500" name="chevron-down" mr={1} />
+                <ChevronDownIcon color="red.500" mr={1} />
                 {downvotes}
               </Text>
             </Flex>
@@ -108,7 +109,7 @@ const Profile: React.FC<{}> = ({}) => {
               data.userProfile.user.username === meData.me.username && (
                 <Box>
                   <IconButton
-                    icon="edit"
+                    icon={<EditIcon />}
                     aria-label="Edit profile"
                     variant="outline"
                     colorScheme="teal"
