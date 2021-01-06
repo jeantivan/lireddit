@@ -1,13 +1,14 @@
 import { useLogoutMutation, useMeQuery } from "@/generated/graphql";
 import { isServer } from "@/utils/isServer";
 import { useApolloClient } from "@apollo/client";
-import { AddIcon } from "@chakra-ui/icons";
+import { AddIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
   Flex,
   Heading,
   IconButton,
+  Icon,
   Link,
   Menu,
   MenuButton,
@@ -15,7 +16,14 @@ import {
   MenuList,
   Tooltip,
   Image,
+  useColorMode,
 } from "@chakra-ui/react";
+import {
+  BsFillPersonFill,
+  BsBoxArrowRight,
+  BsMoon,
+  BsSun,
+} from "react-icons/bs";
 import NextLink from "next/link";
 import React from "react";
 
@@ -26,6 +34,8 @@ export const Navbar: React.FC<{}> = ({}) => {
   const { data, loading } = useMeQuery({
     skip: isServer(),
   });
+
+  const { colorMode, toggleColorMode } = useColorMode();
 
   let body = null;
   if (loading) {
@@ -48,9 +58,13 @@ export const Navbar: React.FC<{}> = ({}) => {
     body = (
       <Flex align="center">
         <Menu>
-          <MenuButton as={Button} borderRadius="4rem">
+          <MenuButton
+            as={Button}
+            borderRadius="4rem"
+            rightIcon={<ChevronDownIcon />}
+          >
             <Image
-              ml={-2}
+              ml={-3}
               mr={2}
               d="inline-block"
               width="32px"
@@ -62,7 +76,10 @@ export const Navbar: React.FC<{}> = ({}) => {
           </MenuButton>
           <MenuList>
             <NextLink href="/[username]" as={`/${data.me.username}`}>
-              <MenuItem>Profile</MenuItem>
+              <MenuItem>
+                <Icon as={BsFillPersonFill} color="gray.500" mr={2} />
+                <span>Profile</span>
+              </MenuItem>
             </NextLink>
 
             <MenuItem
@@ -71,7 +88,8 @@ export const Navbar: React.FC<{}> = ({}) => {
                 await apolloClient.resetStore();
               }}
             >
-              Logout
+              <Icon as={BsBoxArrowRight} color="gray.500" mr={2} />
+              <span>Logout</span>
             </MenuItem>
           </MenuList>
         </Menu>
@@ -86,7 +104,7 @@ export const Navbar: React.FC<{}> = ({}) => {
       zIndex={100}
       p={4}
       borderBottom="1px"
-      bg="white"
+      borderColor="gray.500"
     >
       <Flex flex={1} align="center" maxW={800} m="auto">
         <Heading>
@@ -113,7 +131,7 @@ export const Navbar: React.FC<{}> = ({}) => {
                 zIndex={101}
               >
                 <IconButton
-                  icon={<AddIcon />}
+                  icon={<AddIcon color="gray.500" />}
                   isRound
                   mr={4}
                   aria-label="Create Post"
@@ -122,6 +140,27 @@ export const Navbar: React.FC<{}> = ({}) => {
                 />
               </Tooltip>
             </NextLink>
+            <Tooltip
+              hasArrow
+              label={`Turn ${colorMode === "light" ? "off" : "on"} lights`}
+              aria-label="Switch Color Mode"
+              placement="bottom"
+              zIndex={101}
+            >
+              <IconButton
+                icon={
+                  colorMode === "light" ? (
+                    <Icon as={BsMoon} color="gray.500" />
+                  ) : (
+                    <Icon as={BsSun} color="gray.500" />
+                  )
+                }
+                onClick={toggleColorMode}
+                isRound
+                mr={4}
+                aria-label="Switch Color Mode"
+              />
+            </Tooltip>
 
             {body}
           </Flex>
