@@ -99,6 +99,7 @@ export const Navbar: React.FC<{}> = ({}) => {
 
   return (
     <Flex
+      bg={colorMode === "light" ? "white" : "gray.800"}
       position="sticky"
       top={0}
       zIndex={100}
