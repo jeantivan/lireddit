@@ -11,8 +11,7 @@ import {
   Box,
   Flex,
   Heading,
-  Icon,
-  IconButton,
+  Button,
   Image,
   Stack,
   Tab,
@@ -108,14 +107,16 @@ const Profile: React.FC<{}> = ({}) => {
             {meData?.me &&
               data.userProfile.user.username === meData.me.username && (
                 <Box>
-                  <IconButton
-                    icon={<EditIcon />}
+                  <Button
+                    rightIcon={<EditIcon />}
                     aria-label="Edit profile"
                     variant="outline"
                     colorScheme="teal"
                     isRound
                     onClick={onOpen}
-                  />
+                  >
+                    Edit Profile
+                  </Button>
                 </Box>
               )}
           </Flex>
