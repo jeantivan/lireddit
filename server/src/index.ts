@@ -37,14 +37,14 @@ async function main() {
   // User.delete({});
   // Updoot.delete({});
 
-  //await conn.runMigrations();
+//await conn.runMigrations();
 
   const app = express();
 
   app.use(express.static(path.join(__dirname, "../public")));
 
-  const RedisStore = connectRedis(session);
-  const redis = new Redis(process.env.REDIS_URL);
+  //const RedisStore = connectRedis(session);
+  //const redis = new Redis(process.env.REDIS_URL);
 
   app.set("trust proxy", 1);
 
@@ -57,7 +57,7 @@ async function main() {
   app.use(
     session({
       name: COOKIE_NAME,
-      store: new RedisStore({ client: redis, disableTouch: true }),
+      //store: new RedisStore({ client: redis, disableTouch: true }),
       cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 años
         httpOnly: true,
@@ -85,7 +85,7 @@ async function main() {
     context: ({ req, res }) => ({
       req,
       res,
-      redis,
+      //redis,
       userLoader: createUserLoader(),
       updootLoader: createUpdootLoader(),
     }),
@@ -96,8 +96,8 @@ async function main() {
     cors: false,
   });
 
-  app.listen(parseInt(process.env.PORT), () => {
-    console.log("Server started on localhost:4000");
+  app.listen(parseInt(process.env.PORT || "4000"), () => {
+    console.log("Server started on localhost:" + process.env.PORT);
     console.log(path.join(__dirname, "public"));
   });
 }

@@ -29,10 +29,17 @@
     /* Absolute Imports and Module path aliases */
     "baseUrl": ".",
     "paths": {
-      "@/components/*": ["src/components/*"],
-      "@/utils/*": ["src/utils/*"],
-      "@/generated/*": ["src/generated/*"],
-    }
+      "@/components/*": [
+        "src/components/*"
+      ],
+      "@/utils/*": [
+        "src/utils/*"
+      ],
+      "@/generated/*": [
+        "src/generated/*"
+      ]
+    },
+    "incremental": true
   },
   "include": [
     "next-env.d.ts",
@@ -41,6 +48,5 @@
   ],
   "exclude": [
     "node_modules"
-  ],
-
+  ]
 }

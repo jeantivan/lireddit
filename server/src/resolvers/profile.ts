@@ -39,7 +39,7 @@ export class ProfileResolver {
 
     const profile = await Profile.create({
       ...options,
-      user: req.session.userId,
+      id: req.session.userId,
     }).save();
 
     console.log(profile);
